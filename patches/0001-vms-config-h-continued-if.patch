@@ -1,0 +1,30 @@
+Subject: vms/config_h.com: comment out #if blocks whose condition is continued
+
+gawk 5.4.1's configh.in has autoconf's C23 bool check, an #if whose
+condition spans several lines.  config_h.com passed the first line through
+and commented out the continuation lines, leaving an unterminated #if, so
+every compilation failed with %CC-E-NORIGHTPAREN at config.h line 783.
+Comment out such a block up to its #endif; for DEC C it is a no-op, since
+HAVE_C_BOOL is defined.
+
+--- a/vms/config_h.com	2026-10-03 20:41:59.890224515 +0100
++++ b/vms/config_h.com	2026-10-03 20:41:59.909619648 +0100
+@@ -292,6 +292,18 @@
+ $   endif
+ $!
+ $!
++$!  An #if whose condition continues on the next lines (ends in "\"),
++$!  such as autoconf's C23 bool check, cannot be passed through line by
++$!  line: comment out the whole block up to its #endif.  For DEC C the
++$!  block is a no-op anyway, as HAVE_C_BOOL is defined below.
++$!-----------------------------------------------------------------------
++$   if keyif .eqs. "#if" .and. f$extract(xlen - 1, 1, xline) .eqs. "\"
++$   then
++$	write tf "/* ", xline, " */"
++$	if_block = 3
++$	goto cfgh_in_loop1
++$   endif
++$!
+ $!  Default action for an #if/#else/#endif
+ $!------------------------------------------
+ $   if keyif .eqs. "#if" .or. keyif .eqs. "#el"
