@@ -1,0 +1,78 @@
+Subject: vms/vmstest.com: follow upstream test changes (longwrds, rscompat, colonwarn)
+
+- longwrds: on OpenVMS x86-64 (E9.2) SORT applies the input file's device to
+  the output specification, so "sort sys$input: _longwrds.tmp" tried to
+  write SYS$INPUT:_LONGWRDS.TMP (%SORT-E-WRITEERR); the comparison of the
+  missing file then failed fatally and ended the whole run.  Name the
+  output sys$disk:[]_longwrds.tmp.
+- rscompat: upstream runs it with --posix since 2025-07 (was --traditional).
+- colonwarn: upstream now runs patterns 1 to 5 and expects each run's
+  warnings followed by its output; the VMS rule ran three and compared one
+  run's error file.
+
+--- a/vms/vmstest.com	2026-10-03 20:55:33.491916991 +0100
++++ b/vms/vmstest.com	2026-10-03 21:03:39.509465745 +0100
+@@ -753,6 +753,7 @@
+ $
+ $colonwarn:	echo "''test'"
+ $	test_class = "gawk_ext"
++$!	As test/Makefile.am: patterns 1 to 5, each run's stderr then stdout.
+ $   if f$search("sys$disk:[]_''test'*.tmp;*") .nes. ""
+ $   then
+ $       rm _'test'*.tmp;*
+@@ -761,26 +762,16 @@
+ $   then
+ $       rm _'test'*.err;*
+ $   endif
+-$   define/user sys$error _'test'.err
+-$	gawk -f 'test'.awk 1 < 'test'.in > _'test'.tmp
+-$   define/user sys$error _'test'_2.err
+-$	gawk -f 'test'.awk 2 < 'test'.in > _'test'_2.tmp
+-$   define/user sys$error _'test'_3.err
+-$	gawk -f 'test'.awk 3 < 'test'.in > _'test'_3.tmp
+-$	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
+-$	then
+-$	    delete sys$disk:[]_'test'_%.tmp;2
+-$	endif
+-$	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
+-$	then
+-$	    delete sys$disk:[]_'test'.tmp;2
+-$	endif
+-$	append -
+-       sys$disk:[]_'test'.tmp,sys$disk:[]_'test'.err,-
+-	   sys$disk:[]_'test'_2.tmp,sys$disk:[]_'test'_2.err,-
+-	   sys$disk:[]_'test'_3.tmp -
+-	   _'test'_3.err
+-$	cmp 'test'.ok sys$disk:[]_'test'_3.err;1
++$	cw_i = 1
++$colonwarn_loop:
++$   define/user sys$error _'test'_'cw_i'.err
++$	gawk -f 'test'.awk 'cw_i' < 'test'.in > _'test'_'cw_i'.tmp
++$	cw_i = cw_i + 1
++$	if cw_i .le. 5 then goto colonwarn_loop
++$	copy _'test'_1.err,_'test'_1.tmp,_'test'_2.err,_'test'_2.tmp,-
++	     _'test'_3.err,_'test'_3.tmp,_'test'_4.err,_'test'_4.tmp,-
++	     _'test'_5.err,_'test'_5.tmp _'test'.tmp
++$	cmp 'test'.ok sys$disk:[]_'test'.tmp
+ $	if $status
+ $	then
+ $	    rm _'test'*.tmp;*
+@@ -1018,7 +1009,8 @@
+ $rscompat:
+ $	echo "''test'"
+ $	test_class = "basic"
+-$	gawk --traditional -f 'test'.awk 'test'.in >_'test'.tmp
++$!	Upstream runs this with --posix since 2025-07 (test/Makefile.am NEED_POSIX)
++$	gawk --posix -f 'test'.awk 'test'.in >_'test'.tmp
+ $	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
+ $	then
+ $	    delete sys$disk:[]_'test'.tmp;2
+@@ -1095,7 +1087,7 @@
+ $
+ $longwrds:	echo "longwrds"
+ $	test_class = "basic"
+-$	gawk -v "SORT=sort sys$input: _longwrds.tmp" -f longwrds.awk longwrds.in >_NL:
++$	gawk -v "SORT=sort sys$input: sys$disk:[]_longwrds.tmp" -f longwrds.awk longwrds.in >_NL:
+ $	cmp longwrds.ok sys$disk:[]_longwrds.tmp
+ $	if $status
+ $	then

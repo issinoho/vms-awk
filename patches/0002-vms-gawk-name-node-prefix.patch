@@ -1,0 +1,65 @@
+Subject: vms/gawkmisc.vms: gawk_name strips the image path in more cases
+
+When the CRTL passes argv[0] as a Unix path ("/dka800/.../gawk.exe"),
+gawk_name compares its first component with the device's ALLDEVNAM.  On
+systems where that carries a node or allocation class prefix
+("MYI64$DKA800", "X86VMS$DKA0") the comparison failed, so messages began
+with the full image path instead of "gawk:" and most of the error-message
+tests failed.  Also compare the part after the last '$', and treat a Unix
+path to an image (name.exe) as a DCL-started image even when no device
+check matches (on IA64, "gawk ... 2>&1 >file" still gave such a path).
+
+--- a/vms/gawkmisc.vms	2026-10-03 20:52:33.988438129 +0100
++++ b/vms/gawkmisc.vms	2026-10-03 21:01:53.553706675 +0100
+@@ -239,6 +239,23 @@
+ 				result = (strcasecmp(devnam, vms_name) == 0);
+ 				}
+ 
++				/* The CRTL may report the plain device name
++				 * ("dka800") while ALLDEVNAM carries a node or
++				 * allocation class prefix ("MYI64$DKA800"):
++				 * compare the part after the last '$' too.
++				 */
++				if (result == 0) {
++					char * dollar = strrchr(devnam, '$');
++					if ((dollar != NULL) &&
++					    ((devnam_len - (dollar + 1 - devnam))
++					     == length)) {
++					    strncpy(vms_name, &filespec[1], length);
++					    vms_name[length] = 0;
++					    result = (strcasecmp(dollar + 1,
++							     vms_name) == 0);
++					}
++				}
++
+ 				/* If we have not got a match check for
+ 				 * POSIX Compliant behavior.  To be more
+ 				 * accurate, we could also check to see
+@@ -359,6 +376,27 @@
+ 			}
+ 		}
+ 	}
++
++	/* A Unix path whose last component is an image (name.exe, perhaps
++	 * with a version) is how the CRTL reports an image started from
++	 * DCL, whatever form the device took: on IA64 a "2>&1 >file"
++	 * redirection gave "/dka800/..." that no device check matched.
++	 * An exec()ed "/tmp/program" still keeps its path.
++	 */
++	if ((result == 0) && (filespec[0] == '/')) {
++		const char * last = strrchr(filespec, '/');
++		const char * p;
++		for (p = last; *p != 0; p++) {
++			if ((p[0] == '.') &&
++			    (p[1] == 'e' || p[1] == 'E') &&
++			    (p[2] == 'x' || p[2] == 'X') &&
++			    (p[3] == 'e' || p[3] == 'E') &&
++			    (p[4] == 0 || p[4] == '.' || p[4] == ';')) {
++				result = 1;
++				break;
++			}
++		}
++	}
+ 
+ 	if (result) {
+ 		char * lastslash;
