@@ -1,0 +1,30 @@
+--
+-- PCSI product description for GNU gawk on OpenVMS.
+-- Template: tools/prepare.sh substitutes @PRODUCER@, @BASE@ and @PCSIVERSION@.
+--
+product @PRODUCER@ @BASE@ GAWK @PCSIVERSION@ full ;
+
+    information RELEASE_NOTES phase after ;
+
+    directory [GAWK] ;
+    directory [GAWK.BIN] ;
+    directory [GAWK.DOC] ;
+
+    file [GAWK.BIN]GAWK.EXE ;
+    file [SYS$STARTUP]GAWK$STARTUP.COM ;
+    file [GAWK]GAWK$SETUP.COM ;
+    file [GAWK.DOC]README.VMS ;
+    file [GAWK.DOC]COPYING. ;
+    file [GAWK.DOC]NEWS. ;
+    file [GAWK.DOC]GAWK.TXT ;
+    file [GAWK.DOC]GAWK.1 ;
+
+    -- Define GAWK$ROOT now and print the post-installation tasks (PCSI shows
+    -- only the title of an information message unless /HELP is given).
+    execute postinstall "@PCSI$DESTINATION:[SYS$STARTUP]GAWK$STARTUP.COM INSTALL" interactive ;
+    -- On removal, deassign GAWK$ROOT.
+    execute install "CONTINUE" remove "@PCSI$DESTINATION:[SYS$STARTUP]GAWK$STARTUP.COM REMOVE" ;
+
+    information POST_INSTALL phase after ;
+
+end product ;

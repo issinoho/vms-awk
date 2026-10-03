@@ -23,7 +23,8 @@ VMS files in `vmsport/`.
 |---|---|---|
 | Builds with upstream's MMS description | yes | yes |
 | Upstream VMS test suite (412 tests) | 386 pass, 0 fail | 388 pass, 0 fail |
-| PCSI kit | planned | planned |
+| DCL smoke test (16 checks) | 16/16 | 16/16 |
+| PCSI kit (`ISSINOHO-<base>-GAWK-V0504-1E1-1.PCSI`) | built | built |
 
 See [docs/TESTING.md](docs/TESTING.md) for the results and every skipped test.
 
@@ -45,7 +46,7 @@ See [docs/TESTING.md](docs/TESTING.md) for the results and every skipped test.
 ```
 upstream.conf          upstream version, tarball URL, SHA-256, signing key
 patches/               unified diffs against the upstream tree, applied in order (series)
-overlay/vmsport/       our VMS files (upstream owns vms/): BUILD.COM, kit
+overlay/vmsport/       our VMS files (upstream owns vms/): BUILD.COM, TEST_SMOKE.COM, kit
 tools/                 host-side scripts: fetch, prepare, push, build, vmstest
 docs/                  testing, images
 cache/ staging/ out/   generated locally, not committed
@@ -110,7 +111,12 @@ the same file works for every project. Then:
 ```sh
 tools/build.sh ia64         # upload changed files, upstream's MMS build on the node
 tools/vmstest.sh ia64       # upstream's VMS test suite as a batch job
+tools/test.sh ia64          # our DCL smoke test
+tools/kit.sh ia64           # build, then make the PCSI kit -> out/kits/
 ```
+
+Kit versions follow upstream's own scheme for gawk's three-part versions: the third part
+is the PCSI update and our VMS patch level the ECO, so gawk 5.4.1-vms1 is `V5.4-1E1`.
 
 ## Roadmap
 
