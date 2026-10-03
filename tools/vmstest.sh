@@ -21,6 +21,7 @@ cat > "$job" <<DCL
 \$! version ;2 of _test.tmp (an SSH quirk), so a leftover ;1 would be compared.
 \$ if f\$search("_*.tmp;*") .nes. "" then delete/nolog _*.tmp;*
 \$ if f\$search("_*.err;*") .nes. "" then delete/nolog _*.err;*
+\$ if f\$search("_*.too;*") .nes. "" then delete/nolog _*.too;*
 \$ @[-.VMS]VMSTEST.COM $list
 DCL
 dest=$top/out/vmstest-$node

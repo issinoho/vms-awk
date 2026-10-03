@@ -2,3 +2,4 @@
 0001-vms-config-h-continued-if.patch
 0002-vms-gawk-name-node-prefix.patch
 0003-vms-vmstest-follow-upstream-tests.patch
+0004-printf-negative-zero-vms.patch

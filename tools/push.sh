@@ -19,8 +19,9 @@ remote=$(echo "$name" | tr . _)
 pack=$top/cache/push-$name-$node
 rm -rf "$pack"; mkdir -p "$pack/$remote"
 ( cd "$stage" && find . -maxdepth 1 -type f -print0 | xargs -0 cp -t "$pack/$remote/" ) && cp -a "$stage/vms" "$stage/vmsport" "$stage/support" "$stage/missing_d" "$stage/posix" "$stage/extension" "$stage/test" "$pack/$remote/"
-# Host build leftovers and files VMS cannot use.
-find "$pack/$remote" \( -name 'Makefile*' -o -name '*.in.h' -o -name '*.o' \) -delete
+# Host build leftovers.  (test/Makefile.in stays: vmstest.com's beginfile1
+# reads it as a sample file.)
+find "$pack/$remote" -name '*.o' -delete
 
 echo "push: -> $node:[.$(echo "$remote" | tr a-z A-Z)]"
 read -r _ _ HOST PORT USER WORKDIR SFTPDIR < <(awk -v n="$node" '$1==n' "$top/tools/nodes.conf")

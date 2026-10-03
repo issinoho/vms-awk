@@ -1,0 +1,25 @@
+Subject: printf.c: on OpenVMS, clear the sign of a zero %d value with fabs
+
+printf "%d", -0.4 printed "-0" on IA64: double_to_int gives -0.0, and
+VSI C (IA64) optimises "if (tmpval == -0) tmpval = 0;" away (the value
+already compares equal), so the sign survived into snprintf("%.0f").
+fabs() is not optimised away (test zero2).
+
+--- a/printf.c	2026-10-03 21:14:30.607345223 +0100
++++ b/printf.c	2026-10-03 21:14:30.627845658 +0100
+@@ -906,8 +906,15 @@
+ 	tmpval = double_to_int(arg->numbr);
+ 	if (flags->base == 10 && flags->format != 'u') {
+ 		// signed decimal
++#ifdef __VMS
++		/* VSI C on IA64 drops "if (x == -0) x = 0;" as a no-op, so
++		 * -0.0 reached "%.0f" and printed "-0"; fabs() clears the sign. */
++		if (tmpval == 0)
++			tmpval = fabs(tmpval);
++#else
+ 		if (tmpval == -0)
+ 			tmpval = 0;
++#endif
+ 
+ 		/*
+ 		 * Use snprintf return value to tell if there
