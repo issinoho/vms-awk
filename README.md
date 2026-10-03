@@ -24,9 +24,34 @@ VMS files in `vmsport/`.
 | Builds with upstream's MMS description | yes | yes |
 | Upstream VMS test suite (412 tests) | 386 pass, 0 fail | 388 pass, 0 fail |
 | DCL smoke test (16 checks) | 16/16 | 16/16 |
-| PCSI kit (`ISSINOHO-<base>-GAWK-V0504-1E1-1.PCSI`) | built | built |
+| PCSI kit ([v5.4.1-vms1](https://github.com/issinoho/vms-awk/releases/tag/v5.4.1-vms1)) | `ISSINOHO-I64VMS-GAWK-V0504-1E1-1.PCSI` | `ISSINOHO-X86VMS-GAWK-V0504-1E1-1.PCSI` |
 
 See [docs/TESTING.md](docs/TESTING.md) for the results and every skipped test.
+
+## Installing the kit
+
+Download the kit for your architecture from the
+[latest release](https://github.com/issinoho/vms-awk/releases/latest) and check it against
+the release's `SHA256SUMS`. A kit downloaded through a non-VMS system arrives without its
+record format, so restore that first, then install it:
+
+```
+$ SET FILE/ATTRIBUTE=(RFM:FIX,LRL:8192,MRS:8192,RAT:NONE) ISSINOHO-*-GAWK-V0504-1E1-1.PCSI
+$ PRODUCT INSTALL GAWK /PRODUCER=ISSINOHO /SOURCE=dev:[dir]
+```
+
+The kits have been tested by installing, verifying and removing them on both architectures.
+They are not signed, so PCSI notes that it cannot validate a signature. The kit installs
+`[GAWK.BIN]GAWK.EXE`, the documentation in `[GAWK.DOC]` (`README.VMS`, a plain-text manual
+page `GAWK.TXT`, `GAWK.1`, `NEWS`, `COPYING`) and two procedures:
+
+- `SYS$STARTUP:GAWK$STARTUP.COM` defines `GAWK$ROOT`. It runs once at installation and
+  prints the post-installation tasks. To run it at every boot, add
+  `$ @SYS$STARTUP:GAWK$STARTUP.COM` to `SYS$MANAGER:SYSTARTUP_VMS.COM`.
+- `[GAWK]GAWK$SETUP.COM` defines the `gawk` and `awk` commands for a user (add it to
+  `LOGIN.COM`): `$ @GAWK$ROOT:[000000]GAWK$SETUP.COM`.
+
+Removing the product (`PRODUCT REMOVE GAWK`) deassigns `GAWK$ROOT`.
 
 ## Using gawk on OpenVMS
 
@@ -120,10 +145,9 @@ is the PCSI update and our VMS patch level the ECO, so gawk 5.4.1-vms1 is `V5.4-
 
 ## Roadmap
 
-1. A PCSI kit (`ISSINOHO <base> GAWK`) and a release.
-2. Send patches 0001–0003 to gawk's VMS port maintainer.
-3. A port to OpenVMS **Alpha**, alongside IA64 and x86-64.
-4. Next ports: **GNU wget** ([vms-wget](https://github.com/issinoho/vms-wget)), then
+1. Send patches 0001–0003 to gawk's VMS port maintainer.
+2. A port to OpenVMS **Alpha**, alongside IA64 and x86-64.
+3. Next ports: **GNU wget** ([vms-wget](https://github.com/issinoho/vms-wget)), then
    **curl** ([vms-curl](https://github.com/issinoho/vms-curl)). VSI ships a curl kit, but on
    VSI's slower release cycle; this port will follow curl's own releases in lock-step.
 
