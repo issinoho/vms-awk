@@ -4,11 +4,16 @@
 
 # GNU awk (gawk) for OpenVMS
 
-A build of current GNU awk (gawk) for OpenVMS on **IA64** and **x86-64**, following gawk's
-own releases in lock-step rather than VSI's release cycle. This port starts from
-**gawk 5.4.1**. It is part of the same family as
-[GNU grep](https://github.com/issinoho/vms-grep) and
-[GNU sed](https://github.com/issinoho/vms-sed) for OpenVMS.
+A build of current GNU awk (gawk) for OpenVMS on **IA64** and **x86-64**, following gawk's own
+releases in lock-step rather than VSI's release cycle. This port starts from **gawk 5.4.1**. It
+belongs to the same family as [GNU grep](https://github.com/issinoho/vms-grep),
+[GNU sed](https://github.com/issinoho/vms-sed), [GNU make](https://github.com/issinoho/vms-make),
+[GNU diffutils](https://github.com/issinoho/vms-diffutils),
+[GNU patch](https://github.com/issinoho/vms-patch), [GNU m4](https://github.com/issinoho/vms-m4),
+[GNU Bison](https://github.com/issinoho/vms-bison), [flex](https://github.com/issinoho/vms-flex),
+[GNU Wget](https://github.com/issinoho/vms-wget), [curl](https://github.com/issinoho/vms-curl),
+[PCRE2](https://github.com/issinoho/vms-pcre2) and [zlib](https://github.com/issinoho/vms-zlib) for
+OpenVMS.
 
 Unlike grep and sed, **gawk ships its own OpenVMS port**: the release tarball has a `vms/`
 directory (MMS description, `config_h.com`, VMS-specific sources, the `vmstest.com` test
