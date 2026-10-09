@@ -7,6 +7,7 @@
 [![Release](https://img.shields.io/github/v/release/issinoho/vms-awk?label=release)](https://github.com/issinoho/vms-awk/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/issinoho/vms-awk/total?label=downloads)](https://github.com/issinoho/vms-awk/releases)
 ![OpenVMS](https://img.shields.io/badge/OpenVMS-IA64%20%7C%20x86--64-blue)
+[![License](https://img.shields.io/github/license/issinoho/vms-awk)](COPYING)
 
 A build of current GNU awk (gawk) for OpenVMS on **IA64** and **x86-64**, following gawk's own
 releases in lock-step rather than VSI's release cycle. This port starts from **gawk 5.4.1**. It
