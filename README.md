@@ -4,6 +4,8 @@
 
 # GNU awk (gawk) for OpenVMS
 
+[![Downloads](https://img.shields.io/github/downloads/issinoho/vms-awk/total?label=downloads)](https://github.com/issinoho/vms-awk/releases)
+
 A build of current GNU awk (gawk) for OpenVMS on **IA64** and **x86-64**, following gawk's own
 releases in lock-step rather than VSI's release cycle. This port starts from **gawk 5.4.1**. It
 belongs to the same family as [GNU grep](https://github.com/issinoho/vms-grep),
