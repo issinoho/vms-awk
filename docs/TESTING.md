@@ -2,12 +2,12 @@
 
 gawk ships its own OpenVMS test driver, `vms/vmstest.com`, maintained upstream alongside
 the rest of its VMS port. It runs the upstream test files (`test/*.awk`, `*.in`, `*.ok`)
-with DCL, so **no GNV is needed and it runs on IA64 as well as x86-64**. Results are
+with DCL, so **no GNV is needed and it runs on IA64 and Alpha as well as x86-64**. Results are
 written as JUnit XML (`test/test_output.xml`).
 
 | Layer | Runs on | Command (host) |
 |---|---|---|
-| Upstream VMS test suite, 412 tests | IA64, x86-64 | `tools/vmstest.sh <node> [test ...]` |
+| Upstream VMS test suite, 412 tests | IA64, x86-64, Alpha | `tools/vmstest.sh <node> [test ...]` |
 
 `tools/vmstest.sh` runs `@[-.VMS]VMSTEST.COM` from `[.TEST]` as a batch job, fetches the
 XML and the batch log to `out/vmstest-<node>/`, and summarises them. It deletes earlier
@@ -16,13 +16,34 @@ XML and the batch log to `out/vmstest-<node>/`, and summarises them. It deletes 
 failing run would be compared instead and the test would keep failing.
 
 ## Current results (gawk 5.4.1)
-| Suite | IA64 | x86-64 |
-|---|---|---|
-| Upstream VMS test suite (412 tests) | 386 pass, 0 fail, 26 skipped | 388 pass, 0 fail, 24 skipped |
+| Suite | IA64 | x86-64 | Alpha |
+|---|---|---|---|
+| Upstream VMS test suite (412 tests) | 386 pass, 0 fail, 26 skipped | 388 pass, 0 fail, 24 skipped | 386 pass, 0 fail, 26 skipped |
+| DCL smoke test (16 checks) | 16/16 | 16/16 | 16/16 |
 
 The final full run on each node failed only `beginfile1`, because `tools/push.sh` did not
 upload `test/Makefile.in`, which the test reads as a sample file; with it uploaded the test
 passes on both nodes.
+
+## Alpha (V8.4-2L2, VSI C V7.4-002)
+
+The whole suite runs in batch, as on the other nodes (about 5 minutes). The skip list is the
+same as IA64's, with upstream's reasons from the batch log (`backsmalls1`: needs the utf8-50
+locale; `mbprintf5`: UTF-8 issue); nothing fails, so there was no Alpha-only failure to
+investigate.
+
+Floating point: upstream's `vms/descrip.mms` compiles with `/FLOAT=IEEE/IEEE_MODE=DENORM_RESULTS`
+on everything except VAX, so the Alpha does not get VSI C's G_float default. Checked by hand
+on the node: `printf "%g"` and `%e`/`%f`/`%.17g` are right; `10^308` and `2^1023` are finite
+(G_float would overflow at 10^308); `1e308*10` prints `+inf` and `-1e308*10` `-inf`; `log(0)`
+is `-inf`; `log(-1)` and the `+nan`/`-nan` strings print `-nan`; `1/0` ends with gawk's
+"division by zero attempted"; denormal arithmetic works (`2^-1022/4` is `5.56268e-309`).
+`fmtspcl` (disabled upstream) run by hand gives the expected output except the `%a` and `%A`
+formats, which the C library does not implement (the lines print `%a`). Known limitation: the
+Alpha C library's `strtod` returns 0 for subnormal literals (`1e-310`), and `printf "%e"` of
+`4.9e-324` written as a literal is 0 for the same reason, although a C program
+compiled with the same qualifiers computes and prints subnormal results correctly.
+`manyfiles` (skipped upstream) fails if forced, at the 499th output file (`i/o error`).
 
 ## Skipped tests
 These skips are upstream's own (`vms/vmstest.com`), with upstream's reasons.
@@ -50,8 +71,8 @@ These skips are upstream's own (`vms/vmstest.com`), with upstream's reasons.
 | pty1 | both | Not supported |
 | strftime | both | Needs GNV coreutils' gnv$date.exe |
 | backbigs1 | both | Needs a locale VMS does not ship |
-| backsmalls1 | IA64 only | Needs the UTF8-50 locale (IA64 has only UTF8-20) |
-| mbprintf5 | IA64 only | Test not currently passing on VMS (UTF-8 issue) |
+| backsmalls1 | IA64 and Alpha | Needs the UTF8-50 locale (IA64 has only UTF8-20) |
+| mbprintf5 | IA64 and Alpha | Test not currently passing on VMS (UTF-8 issue) |
 | double1 | both | Skipped |
 | double2 | both | Skipped |
 | fmtspcl | both | Not supported |

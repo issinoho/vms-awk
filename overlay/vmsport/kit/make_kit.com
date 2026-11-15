@@ -45,6 +45,7 @@ $ if f$search("''out'*.PCSI;*") .nes. "" then delete/nolog 'out'*.PCSI;*
 $ if f$search("''mat'*.*;*") .nes. "" then delete/nolog 'mat'*.*;*
 $ copy/nolog 'image' 'mat'GAWK.EXE
 $ copy/nolog [.VMSPORT.KIT]GAWK$STARTUP.COM,GAWK$SETUP.COM,README.VMS 'mat'
+$ if base .eqs. "AXPVMS" then copy/nolog [.VMSPORT.KIT]README_AXPVMS.VMS 'mat'README.VMS
 $ copy/nolog [.VMSPORT.KIT.DOC]*.* 'mat'
 $ matspec = f$parse(mat,,,"DEVICE","NO_CONCEAL") + f$parse(mat,,,"DIRECTORY","NO_CONCEAL")
 $!

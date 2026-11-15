@@ -10,7 +10,8 @@ list=${2:-all}
 . "$top/upstream.conf"
 remote=$(echo "$UPSTREAM_NAME-$UPSTREAM_VERSION" | tr . _)
 REMOTE=$(echo "$remote" | tr a-z A-Z)
-read -r _ _ _ _ _ WORKDIR _ < <(awk -v n="$node" '$1==n' "$top/tools/nodes.conf")
+read -r _ ARCH _ _ _ WORKDIR _ < <(awk -v n="$node" '$1==n' "$top/tools/nodes.conf")
+mode=run; [ "$ARCH" = ALPHA ] && mode=batch   # interactive ssh output is unreliable on the Alpha (and slow)
 
 job=$top/cache/vmstest-$node.com
 cat > "$job" <<DCL

@@ -6,10 +6,10 @@
 
 [![Release](https://img.shields.io/github/v/release/issinoho/vms-awk?label=release)](https://github.com/issinoho/vms-awk/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/issinoho/vms-awk/total?label=downloads)](https://github.com/issinoho/vms-awk/releases)
-![OpenVMS](https://img.shields.io/badge/OpenVMS-IA64%20%7C%20x86--64-blue)
+![OpenVMS](https://img.shields.io/badge/OpenVMS-IA64%20%7C%20x86--64%20%7C%20Alpha-blue)
 [![License](https://img.shields.io/github/license/issinoho/vms-awk)](COPYING)
 
-A build of current GNU awk (gawk) for OpenVMS on **IA64** and **x86-64**, following gawk's own
+A build of current GNU awk (gawk) for OpenVMS on **IA64**, **x86-64** and **Alpha**, following gawk's own
 releases in lock-step rather than VSI's release cycle. This port starts from **gawk 5.4.1**. It
 belongs to the same family as [GNU grep](https://github.com/issinoho/vms-grep),
 [GNU sed](https://github.com/issinoho/vms-sed), [GNU make](https://github.com/issinoho/vms-make),
@@ -37,6 +37,13 @@ VMS files in `vmsport/`.
 | Upstream VMS test suite (412 tests) | 386 pass, 0 fail | 388 pass, 0 fail |
 | DCL smoke test (16 checks) | 16/16 | 16/16 |
 | PCSI kit ([v5.4.1-vms1](https://github.com/issinoho/vms-awk/releases/tag/v5.4.1-vms1)) | `ISSINOHO-I64VMS-GAWK-V0504-1E1-1.PCSI` | `ISSINOHO-X86VMS-GAWK-V0504-1E1-1.PCSI` |
+
+**Alpha (v5.4.1-vms2, a dedicated Alpha release; IA64 and x86-64 stay on vms1):** built on
+OpenVMS Alpha V8.4-2L2 with VSI C V7.4-002 by upstream's MMS description (only informational
+`UNKNOWNPRAGMA` messages); upstream VMS test suite 386 pass, 0 fail, 26 skipped (the same
+skips as IA64); DCL smoke test 16/16; kit `ISSINOHO-AXPVMS-GAWK-V0504-1E2-1.PCSI`. gawk is
+compiled with IEEE floating point (`/FLOAT=IEEE/IEEE_MODE=DENORM_RESULTS`, which upstream's
+port selects on everything but VAX) instead of VSI C's G_float default on the Alpha.
 
 See [docs/TESTING.md](docs/TESTING.md) for the results and every skipped test.
 
@@ -108,8 +115,9 @@ configures and builds it on the VMS system with VSI C and MMS.
 ### What you need
 
 - **Linux host:** git, bash, python3, curl and gpg. ssh/sftp too, for the automated route.
-- **OpenVMS IA64 or x86-64:** VSI C and MMS. OpenSSH for the automated route. Tested on
-  IA64 V8.4-2L3 with VSI C 7.4, and on x86-64 E9.2-4 with VSI C 7.7.
+- **OpenVMS IA64, x86-64 or Alpha:** VSI C and MMS. OpenSSH for the automated route. Tested on
+  IA64 V8.4-2L3 with VSI C 7.4, on x86-64 E9.2-4 with VSI C 7.7, and on Alpha V8.4-2L2 with
+  VSI C V7.4-002. No GNV, Perl or Python is needed on the VMS system.
 
 ### 1. Prepare the source tree (Linux)
 
@@ -146,7 +154,7 @@ Set up `tools/nodes.conf` and an ssh key as described in
 the same file works for every project. Then:
 
 ```sh
-tools/build.sh ia64         # upload changed files, upstream's MMS build on the node
+tools/build.sh ia64         # (or x86, alpha) upload changed files, upstream's MMS build on the node
 tools/vmstest.sh ia64       # upstream's VMS test suite as a batch job
 tools/test.sh ia64          # our DCL smoke test
 tools/kit.sh ia64           # build, then make the PCSI kit -> out/kits/
@@ -158,7 +166,7 @@ is the PCSI update and our VMS patch level the ECO, so gawk 5.4.1-vms1 is `V5.4-
 ## Roadmap
 
 1. Send patches 0001–0003 to gawk's VMS port maintainer.
-2. A port to OpenVMS **Alpha**, alongside IA64 and x86-64.
+2. ~~A port to OpenVMS **Alpha**, alongside IA64 and x86-64.~~ Done: see Status (Alpha kit, patch level 2).
 
 The family of ports, all for IA64 and x86-64 (MariaDB: x86-64 only), each following its upstream releases:
 

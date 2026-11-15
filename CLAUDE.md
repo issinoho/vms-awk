@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Guidance for working in this repository: GNU awk (gawk) for OpenVMS (IA64 and x86-64),
+Guidance for working in this repository: GNU awk (gawk) for OpenVMS (IA64, x86-64 and Alpha),
 built with **gawk's own upstream VMS port** (`vms/` in the release tarball), wrapped by the
 same tooling as `~/projects/vms-grep` and `~/projects/vms-sed`. Read README.md first.
 
@@ -37,11 +37,29 @@ same tooling as `~/projects/vms-grep` and `~/projects/vms-sed`. Read README.md f
   `tools/nodes.conf`.
 - Keep `docs/TESTING.md` and the README status table in step with test results.
 
+## Alpha
+
+- `build.sh`/`test.sh`/`kit.sh`/`installcheck.sh` use `vms.sh batch` there (interactive ssh
+  output is unreliable; a batch job starts in the login directory, so each job sets default
+  to the work directory). `vmstest.sh` always used batch. `vms.sh` is vms-grep's (it retries
+  a command that never started).
+- DCL: compare architecture names with `.EQS.`, never `.EQ.` (integer compare: every name
+  equals every other). `build.com` and `make_kit.com` upper-case `F$GETSYI("ARCH_NAME")`.
+  Upstream's `vms/` was checked: `config_h.com` uses the numeric `ARCH_TYPE` (`.EQ.`, correct),
+  `vmstest.com` upper-cases `ARCH_NAME` before `.EQS.`; the other `vms/*.com` that read it are
+  not part of our build. No patch needed.
+- Float: upstream's `descrip.mms` compiles with `/FLOAT=IEEE/IEEE_MODE=DENORM_RESULTS` on
+  everything except VAX (`.ifdef __VAX__`), so the Alpha gets IEEE T_float, not VSI C's G_float
+  default. Nothing to override; the build log shows the qualifiers on every compile.
+- The AXPVMS kit has its own README (`README_AXPVMS.VMS`). Patch level 2 is the Alpha kit; the
+  x86-64 and IA64 kits stay on 1.
+- The upstream suite runs on the Alpha (no GNV needed): `tools/vmstest.sh alpha`.
+
 ## Commands
 
 ```sh
 tools/prepare.sh                        # always first after changing patches/overlay
-tools/build.sh <ia64|x86> [ALL|CLEAN] [KEEP_GOING]
+tools/build.sh <ia64|x86|alpha> [ALL|CLEAN] [KEEP_GOING]
 tools/vmstest.sh <node> [tests...]      # upstream's VMS test suite (batch; ~15 min for all)
 tools/vms.sh <node> dcl '<cmd>' ...     # run DCL; also run/batch/put/get
 tools/kit.sh <node>                     # PCSI kit -> out/kits/ (producer ISSINOHO)  [to come]
