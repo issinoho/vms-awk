@@ -51,8 +51,8 @@ same tooling as `~/projects/vms-grep` and `~/projects/vms-sed`. Read README.md f
 - Float: upstream's `descrip.mms` compiles with `/FLOAT=IEEE/IEEE_MODE=DENORM_RESULTS` on
   everything except VAX (`.ifdef __VAX__`), so the Alpha gets IEEE T_float, not VSI C's G_float
   default. Nothing to override; the build log shows the qualifiers on every compile.
-- The AXPVMS kit has its own README (`README_AXPVMS.VMS`). Patch level 2 is the Alpha kit; the
-  x86-64 and IA64 kits stay on 1.
+- The AXPVMS kit has its own README (`README_AXPVMS.VMS`). Since 5.4.2-vms1 all
+  architectures share one patch level.
 - The upstream suite runs on the Alpha (no GNV needed): `tools/vmstest.sh alpha`.
 
 ## Commands

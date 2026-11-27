@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/github/license/issinoho/vms-awk)](COPYING)
 
 A build of current GNU awk (gawk) for OpenVMS on **IA64**, **x86-64** and **Alpha**, following gawk's own
-releases in lock-step rather than VSI's release cycle. This port starts from **gawk 5.4.1**. It
+releases in lock-step rather than VSI's release cycle. This port is at **gawk 5.4.2**. It
 belongs to the same family as [GNU grep](https://github.com/issinoho/vms-grep),
 [GNU sed](https://github.com/issinoho/vms-sed), [GNU make](https://github.com/issinoho/vms-make),
 [GNU diffutils](https://github.com/issinoho/vms-diffutils),
@@ -31,19 +31,21 @@ VMS files in `vmsport/`.
 
 ## Status
 
-| | IA64 (OpenVMS V8.4-2L3, VSI C 7.4) | x86-64 (OpenVMS E9.2-4, VSI C 7.7) |
+| | x86-64 (OpenVMS E9.2-4, VSI C 7.7) | Alpha (OpenVMS V8.4-2L2, VSI C 7.4) |
 |---|---|---|
 | Builds with upstream's MMS description | yes | yes |
-| Upstream VMS test suite (412 tests) | 386 pass, 0 fail | 388 pass, 0 fail |
+| Upstream VMS test suite (412 tests) | 388 pass, 0 fail | 386 pass, 0 fail |
 | DCL smoke test (16 checks) | 16/16 | 16/16 |
-| PCSI kit ([v5.4.1-vms1](https://github.com/issinoho/vms-awk/releases/tag/v5.4.1-vms1)) | `ISSINOHO-I64VMS-GAWK-V0504-1E1-1.PCSI` | `ISSINOHO-X86VMS-GAWK-V0504-1E1-1.PCSI` |
+| Kit install, smoke test of the installed image, remove | clean | clean |
+| PCSI kit ([v5.4.2-vms1](https://github.com/issinoho/vms-awk/releases/tag/v5.4.2-vms1)) | `ISSINOHO-X86VMS-GAWK-V0504-2E1-1.PCSI` | `ISSINOHO-AXPVMS-GAWK-V0504-2E1-1.PCSI` |
 
-**Alpha (v5.4.1-vms2, a dedicated Alpha release; IA64 and x86-64 stay on vms1):** built on
-OpenVMS Alpha V8.4-2L2 with VSI C V7.4-002 by upstream's MMS description (only informational
-`UNKNOWNPRAGMA` messages); upstream VMS test suite 386 pass, 0 fail, 26 skipped (the same
-skips as IA64); DCL smoke test 16/16; kit `ISSINOHO-AXPVMS-GAWK-V0504-1E2-1.PCSI`. gawk is
-compiled with IEEE floating point (`/FLOAT=IEEE/IEEE_MODE=DENORM_RESULTS`, which upstream's
-port selects on everything but VAX) instead of VSI C's G_float default on the Alpha.
+**IA64:** gawk 5.4.2 has no IA64 kit yet: the IA64 build node is unavailable for now. Its 5.4.1
+kit (`ISSINOHO-I64VMS-GAWK-V0504-1E1-1.PCSI`, 386 pass, 0 fail) stays in
+[v5.4.1-vms1](https://github.com/issinoho/vms-awk/releases/tag/v5.4.1-vms1).
+
+On the Alpha, upstream's MMS description builds with only informational `UNKNOWNPRAGMA`
+messages, and gawk is compiled with IEEE floating point (`/FLOAT=IEEE/IEEE_MODE=DENORM_RESULTS`,
+which upstream's port selects on everything but VAX) instead of VSI C's G_float default.
 
 See [docs/TESTING.md](docs/TESTING.md) for the results and every skipped test.
 
@@ -55,7 +57,7 @@ the release's `SHA256SUMS`. A kit downloaded through a non-VMS system arrives wi
 record format, so restore that first, then install it:
 
 ```
-$ SET FILE/ATTRIBUTE=(RFM:FIX,LRL:8192,MRS:8192,RAT:NONE) ISSINOHO-*-GAWK-V0504-1E1-1.PCSI
+$ SET FILE/ATTRIBUTE=(RFM:FIX,LRL:8192,MRS:8192,RAT:NONE) ISSINOHO-*-GAWK-V0504-2E1-1.PCSI
 $ PRODUCT INSTALL GAWK /PRODUCER=ISSINOHO /SOURCE=dev:[dir]
 ```
 
@@ -130,11 +132,11 @@ tools/prepare.sh
 This downloads the gawk release named in `upstream.conf`, checks its SHA-256 and its GPG
 signature against the GNU keyring, applies `patches/`, adds `overlay/`, and checks that
 upstream's `vms/descrip.mms` covers every source file the Unix build compiles. The result
-is in `staging/gawk-5.4.1/`.
+is in `staging/gawk-5.4.2/`.
 
 ### 2a. Build on VMS by hand
 
-Copy the top-level files of `staging/gawk-5.4.1/` and its `vms/`, `vmsport/`, `support/`,
+Copy the top-level files of `staging/gawk-5.4.2/` and its `vms/`, `vmsport/`, `support/`,
 `missing_d/`, `posix/`, `extension/` and (for the tests) `test/` directories to the VMS
 system. Then:
 
@@ -161,7 +163,7 @@ tools/kit.sh ia64           # build, then make the PCSI kit -> out/kits/
 ```
 
 Kit versions follow upstream's own scheme for gawk's three-part versions: the third part
-is the PCSI update and our VMS patch level the ECO, so gawk 5.4.1-vms1 is `V5.4-1E1`.
+is the PCSI update and our VMS patch level the ECO, so gawk 5.4.2-vms1 is `V5.4-2E1`.
 
 ## Roadmap
 

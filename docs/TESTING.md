@@ -15,11 +15,14 @@ XML and the batch log to `out/vmstest-<node>/`, and summarises them. It deletes 
 `;2` of the new output (a workaround for an SSH quirk), so a leftover `;1` from an earlier
 failing run would be compared instead and the test would keep failing.
 
-## Current results (gawk 5.4.1)
-| Suite | IA64 | x86-64 | Alpha |
+## Current results (gawk 5.4.2)
+| Suite | x86-64 | Alpha | IA64 (5.4.1) |
 |---|---|---|---|
-| Upstream VMS test suite (412 tests) | 386 pass, 0 fail, 26 skipped | 388 pass, 0 fail, 24 skipped | 386 pass, 0 fail, 26 skipped |
+| Upstream VMS test suite (412 tests) | 388 pass, 0 fail, 24 skipped | 386 pass, 0 fail, 26 skipped | 386 pass, 0 fail, 26 skipped |
 | DCL smoke test (16 checks) | 16/16 | 16/16 | 16/16 |
+
+gawk 5.4.2 gives the same results as 5.4.1 on x86-64 and Alpha, with the same skips. It was
+not run on IA64, whose node is unavailable for now.
 
 The final full run on each node failed only `beginfile1`, because `tools/push.sh` did not
 upload `test/Makefile.in`, which the test reads as a sample file; with it uploaded the test
